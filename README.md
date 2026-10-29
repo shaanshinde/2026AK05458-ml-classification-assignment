@@ -11,7 +11,25 @@ TODO: Describe the classification problem being solved.
 
 ## b. Dataset Description
 
-TODO: Name the dataset (Kaggle/UCI), its source link, number of rows and features (min 12 features, min 500 rows), and the target variable.
+**Dataset:** Steel Plates Faults, from the UCI Machine Learning Repository (dataset id 198): https://archive.ics.uci.edu/dataset/198/steel+plates+faults
+
+**Problem:** Each row describes a surface defect found on a stainless steel plate. The features describe the defect's position, size, shape, brightness (luminosity) and the type and thickness of the steel. The goal is to predict which type of fault the defect is.
+
+**Size:** 1,941 rows and 27 numeric input features. There are no missing values.
+
+**Target:** In the original data the fault type is stored as 7 separate 0/1 columns. Every row has exactly one of them set to 1, so `prepare_data.py` combines them into a single text column called `Fault_Type`. This makes it a **multi-class classification problem** with 7 classes:
+
+| Fault_Type | Count | Percent |
+|---|---|---|
+| Other_Faults | 673 | 34.7% |
+| Bumps | 402 | 20.7% |
+| K_Scratch | 391 | 20.1% |
+| Z_Scratch | 190 | 9.8% |
+| Pastry | 158 | 8.1% |
+| Stains | 72 | 3.7% |
+| Dirtiness | 55 | 2.8% |
+
+The classes are imbalanced, so the data is split 80/20 into train (1,552 rows) and test (389 rows) sets using a stratified split with `random_state=42`. The test set is saved as `test_data.csv` at the repo root. The exploratory analysis is in `notebooks/01_eda.ipynb`.
 
 ## c. GitHub Repository Link
 
