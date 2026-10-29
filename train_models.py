@@ -1,10 +1,156 @@
 """Train and evaluate the classification models for ML Assignment 2.
 
-Planned responsibilities:
-- Load the raw dataset from data/.
-- Preprocess features (encoding, scaling) and split into train/test sets.
-- Train five models: Logistic Regression, Decision Tree, KNN, Naive Bayes, SVM.
-- Evaluate each model on Accuracy, AUC, Precision, Recall, F1 and MCC.
-- Save the fitted models plus scaler/encoder artifacts to model/ for app.py.
-- Export a held-out test split as test_data.csv for use in the Streamlit app.
+Each model is tuned with GridSearchCV on data/train_data.csv only, then
+evaluated once on test_data.csv. test_data.csv is never used for training
+or tuning.
+
+Usage:
+    python train_models.py --model logistic_regression   # train one model
+    python train_models.py                               # train every model in MODELS
+
+For each trained model this script:
+- saves the best pipeline to model/<name>.joblib
+- adds or updates its row in model/metrics.csv
+- adds or updates its best parameters in model/best_params.json
+- prints the test metrics, best parameters and classification report
+It also saves model/feature_columns.json and model/class_labels.json.
+
+To add a new model, add an entry to MODELS.
 """
+import argparse
+import json
+from pathlib import Path
+
+import joblib
+import pandas as pd
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report
+from sklearn.model_selection import GridSearchCV, StratifiedKFold
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+
+from model_utils import FEATURE_COLUMNS, METRIC_NAMES, TARGET_COLUMN, compute_metrics
+
+RANDOM_STATE = 42
+CV_FOLDS = 5
+CV_SCORING = "f1_macro"
+
+ROOT = Path(__file__).resolve().parent
+TRAIN_PATH = ROOT / "data" / "train_data.csv"
+TEST_PATH = ROOT / "test_data.csv"
+MODEL_DIR = ROOT / "model"
+METRICS_PATH = MODEL_DIR / "metrics.csv"
+BEST_PARAMS_PATH = MODEL_DIR / "best_params.json"
+FEATURE_COLUMNS_PATH = MODEL_DIR / "feature_columns.json"
+CLASS_LABELS_PATH = MODEL_DIR / "class_labels.json"
+
+# Model definitions. The key is used for the file name (model/<key>.joblib),
+# "display_name" is what appears in metrics.csv and the README table.
+MODELS = {
+    "logistic_regression": {
+        "display_name": "Logistic Regression",
+        "pipeline": Pipeline([
+            ("scaler", StandardScaler()),
+            ("model", LogisticRegression(max_iter=5000)),
+        ]),
+        "param_grid": {"model__C": [0.01, 0.1, 1, 10, 100]},
+    },
+}
+
+
+def load_split(path: Path) -> tuple[pd.DataFrame, pd.Series]:
+    df = pd.read_csv(path)
+    missing = set(FEATURE_COLUMNS + [TARGET_COLUMN]) - set(df.columns)
+    if missing:
+        raise SystemExit(f"{path.name} is missing columns: {sorted(missing)}")
+    return df[FEATURE_COLUMNS], df[TARGET_COLUMN]
+
+
+def update_metrics_csv(display_name: str, metrics: dict) -> None:
+    row = {"Model": display_name, **metrics}
+    if METRICS_PATH.exists():
+        table = pd.read_csv(METRICS_PATH)
+        if display_name in table["Model"].values:
+            table.loc[table["Model"] == display_name, METRIC_NAMES] = [
+                metrics[m] for m in METRIC_NAMES
+            ]
+        else:
+            table = pd.concat([table, pd.DataFrame([row])], ignore_index=True)
+    else:
+        table = pd.DataFrame([row])
+    table[["Model"] + METRIC_NAMES].to_csv(METRICS_PATH, index=False)
+
+
+def update_best_params(name: str, best_params: dict) -> None:
+    all_params = {}
+    if BEST_PARAMS_PATH.exists():
+        all_params = json.loads(BEST_PARAMS_PATH.read_text())
+    all_params[name] = best_params
+    BEST_PARAMS_PATH.write_text(json.dumps(all_params, indent=2) + "\n")
+
+
+def save_json(path: Path, data) -> None:
+    path.write_text(json.dumps(data, indent=2) + "\n")
+
+
+def train_one(name: str, X_train, y_train, X_test, y_test) -> None:
+    spec = MODELS[name]
+    display_name = spec["display_name"]
+    print(f"\n=== {display_name} ===")
+
+    cv = StratifiedKFold(n_splits=CV_FOLDS, shuffle=True, random_state=RANDOM_STATE)
+    search = GridSearchCV(
+        spec["pipeline"],
+        spec["param_grid"],
+        cv=cv,
+        scoring=CV_SCORING,
+        n_jobs=-1,
+    )
+    search.fit(X_train, y_train)
+    best_model = search.best_estimator_
+
+    model_path = MODEL_DIR / f"{name}.joblib"
+    joblib.dump(best_model, model_path)
+
+    metrics = compute_metrics(best_model, X_test, y_test)
+    update_metrics_csv(display_name, metrics)
+    update_best_params(name, search.best_params_)
+
+    print(f"Saved model: {model_path.relative_to(ROOT)}")
+    print(f"Best parameters: {search.best_params_}")
+    print(f"Best CV {CV_SCORING} (train data): {search.best_score_:.4f}")
+    print("\nTest metrics:")
+    for metric_name, value in metrics.items():
+        print(f"  {metric_name:<10}{value:.4f}")
+    print("\nClassification report (test data):")
+    print(classification_report(y_test, best_model.predict(X_test), digits=4, zero_division=0))
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    parser.add_argument(
+        "--model",
+        choices=sorted(MODELS),
+        help="Train only this model. If left out, every model in MODELS is trained.",
+    )
+    args = parser.parse_args()
+
+    X_train, y_train = load_split(TRAIN_PATH)
+    X_test, y_test = load_split(TEST_PATH)
+    print(f"Train rows: {len(X_train)}, test rows: {len(X_test)}, "
+          f"features: {len(FEATURE_COLUMNS)}")
+
+    MODEL_DIR.mkdir(exist_ok=True)
+    save_json(FEATURE_COLUMNS_PATH, FEATURE_COLUMNS)
+    save_json(CLASS_LABELS_PATH, sorted(y_train.unique()))
+
+    names = [args.model] if args.model else list(MODELS)
+    for name in names:
+        train_one(name, X_train, y_train, X_test, y_test)
+
+    print(f"\nMetrics table: {METRICS_PATH.relative_to(ROOT)}")
+    print(pd.read_csv(METRICS_PATH).to_string(index=False))
+
+
+if __name__ == "__main__":
+    main()
