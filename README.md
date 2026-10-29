@@ -7,7 +7,11 @@ BITS Pilani WILP, M.Tech, Machine Learning Assignment 2.
 
 ## a. Problem Statement
 
-TODO: Describe the classification problem being solved.
+Steel plates are checked for surface defects during manufacturing. Identifying the type of each defect by hand is slow and inconsistent, so the aim of this project is to classify defects automatically from measurements taken of each one.
+
+Given the 27 measured features of a defect (its position, size, shape, brightness, and the type and thickness of the steel), the task is to predict which of 7 fault types it belongs to: Pastry, Z_Scratch, K_Scratch, Stains, Dirtiness, Bumps or Other_Faults. This is a multi-class classification problem.
+
+Five classification models (Logistic Regression, Decision Tree, KNN, Naive Bayes and Support Vector Machine) are trained on the same data and compared on Accuracy, AUC, Precision, Recall, F1 and MCC to find which works best for this dataset. The trained models are then made available in a Streamlit app, where a user can upload test data and see the predictions and evaluation metrics.
 
 ## b. Dataset Description
 
