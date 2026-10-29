@@ -41,13 +41,15 @@ https://github.com/shaanshinde/2026AK05458-ml-classification-assignment
 
 ## d. Models Used
 
-TODO: Fill in the metrics after running `train_models.py`.
+TODO: Fill in the metrics for the remaining models after running `train_models.py`.
+
+All metrics are measured on the test set (`test_data.csv`, 389 rows). Precision, Recall and F1 are macro-averaged over the 7 classes, and AUC is one-vs-rest macro-averaged.
 
 ### Comparison Table
 
 | ML Model Name | Accuracy | AUC | Precision | Recall | F1 | MCC |
 |---|---|---|---|---|---|---|
-| Logistic Regression | | | | | | |
+| Logistic Regression | 0.7275 | 0.9379 | 0.7613 | 0.7305 | 0.7418 | 0.6487 |
 | Decision Tree | | | | | | |
 | KNN | | | | | | |
 | Naive Bayes | | | | | | |

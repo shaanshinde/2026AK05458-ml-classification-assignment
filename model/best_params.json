@@ -1,0 +1,5 @@
+{
+  "logistic_regression": {
+    "model__C": 1
+  }
+}
