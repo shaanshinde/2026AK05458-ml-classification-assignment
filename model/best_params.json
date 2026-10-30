@@ -6,5 +6,10 @@
     "model__criterion": "entropy",
     "model__max_depth": 15,
     "model__min_samples_leaf": 1
+  },
+  "knn": {
+    "model__n_neighbors": 7,
+    "model__p": 2,
+    "model__weights": "distance"
   }
 }

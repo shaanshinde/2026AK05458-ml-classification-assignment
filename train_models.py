@@ -27,6 +27,7 @@ import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, f1_score
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier
@@ -70,6 +71,18 @@ MODELS = {
             "model__criterion": ["gini", "entropy"],
         },
     },
+    "knn": {
+        "display_name": "KNN",
+        "pipeline": Pipeline([
+            ("scaler", StandardScaler()),
+            ("model", KNeighborsClassifier()),
+        ]),
+        "param_grid": {
+            "model__n_neighbors": [3, 5, 7, 9, 11, 15, 21],
+            "model__weights": ["uniform", "distance"],
+            "model__p": [1, 2],
+        },
+    },
 }
 TOP_FEATURES_TO_SHOW = 10
 
@@ -106,7 +119,7 @@ def update_per_class_f1(display_name: str, model, y_true, y_pred) -> None:
     else:
         table = pd.DataFrame(index=column.index)
     table[display_name] = column
-    table.to_csv(PER_CLASS_F1_PATH)
+    table.to_csv(PER_CLASS_F1_PATH, float_format="%.4f")
 
 
 def update_best_params(name: str, best_params: dict) -> None:

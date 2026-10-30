@@ -51,7 +51,7 @@ All metrics are measured on the test set (`test_data.csv`, 389 rows). Precision,
 |---|---|---|---|---|---|---|
 | Logistic Regression | 0.7275 | 0.9379 | 0.7613 | 0.7305 | 0.7418 | 0.6487 |
 | Decision Tree | 0.7532 | 0.8583 | 0.7739 | 0.7597 | 0.7647 | 0.6811 |
-| KNN | | | | | | |
+| KNN | 0.7558 | 0.9251 | 0.7453 | 0.7687 | 0.7546 | 0.6884 |
 | Naive Bayes | | | | | | |
 | Support Vector Machine | | | | | | |
 
@@ -88,12 +88,12 @@ streamlit run app.py
 
 This table shows how well each model identifies each fault type on the test data (F1 score per fault type), along with the number of test plates for each fault type.
 
-| Fault Type | Test Plates | Logistic Regression | Decision Tree |
-|---|---|---|---|
-| Bumps | 81 | 0.6216 | 0.7186 |
-| Dirtiness | 11 | 0.7368 | 0.8182 |
-| K_Scratch | 78 | 0.9281 | 0.8571 |
-| Other_Faults | 135 | 0.6761 | 0.7143 |
-| Pastry | 32 | 0.5373 | 0.4643 |
-| Stains | 14 | 0.8571 | 0.8571 |
-| Z_Scratch | 38 | 0.8354 | 0.9231 |
+| Fault Type | Test Plates | Logistic Regression | Decision Tree | KNN |
+|---|---|---|---|---|
+| Bumps | 81 | 0.6216 | 0.7186 | 0.6864 |
+| Dirtiness | 11 | 0.7368 | 0.8182 | 0.8182 |
+| K_Scratch | 78 | 0.9281 | 0.8571 | 0.9615 |
+| Other_Faults | 135 | 0.6761 | 0.7143 | 0.7000 |
+| Pastry | 32 | 0.5373 | 0.4643 | 0.4483 |
+| Stains | 14 | 0.8571 | 0.8571 | 0.8000 |
+| Z_Scratch | 38 | 0.8354 | 0.9231 | 0.8675 |
