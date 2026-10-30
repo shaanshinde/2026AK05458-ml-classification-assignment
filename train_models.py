@@ -28,6 +28,7 @@ from sklearn.metrics import classification_report
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+from sklearn.tree import DecisionTreeClassifier
 
 from model_utils import FEATURE_COLUMNS, METRIC_NAMES, TARGET_COLUMN, compute_metrics
 
@@ -55,7 +56,20 @@ MODELS = {
         ]),
         "param_grid": {"model__C": [0.01, 0.1, 1, 10, 100]},
     },
+    "decision_tree": {
+        "display_name": "Decision Tree",
+        "pipeline": Pipeline([
+            ("scaler", StandardScaler()),
+            ("model", DecisionTreeClassifier(random_state=RANDOM_STATE)),
+        ]),
+        "param_grid": {
+            "model__max_depth": [None, 5, 10, 15, 20],
+            "model__min_samples_leaf": [1, 2, 5, 10],
+            "model__criterion": ["gini", "entropy"],
+        },
+    },
 }
+TOP_FEATURES_TO_SHOW = 10
 
 
 def load_split(path: Path) -> tuple[pd.DataFrame, pd.Series]:
@@ -124,6 +138,13 @@ def train_one(name: str, X_train, y_train, X_test, y_test) -> None:
         print(f"  {metric_name:<10}{value:.4f}")
     print("\nClassification report (test data):")
     print(classification_report(y_test, best_model.predict(X_test), digits=4, zero_division=0))
+
+    final_step = best_model.named_steps["model"]
+    if hasattr(final_step, "feature_importances_"):
+        importances = pd.Series(final_step.feature_importances_, index=FEATURE_COLUMNS)
+        top = importances.sort_values(ascending=False).head(TOP_FEATURES_TO_SHOW)
+        print(f"Top {TOP_FEATURES_TO_SHOW} most important features:")
+        print(top.round(4).to_string())
 
 
 def main() -> None:

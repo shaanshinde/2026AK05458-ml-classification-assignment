@@ -1,5 +1,10 @@
 {
   "logistic_regression": {
     "model__C": 1
+  },
+  "decision_tree": {
+    "model__criterion": "entropy",
+    "model__max_depth": 15,
+    "model__min_samples_leaf": 1
   }
 }

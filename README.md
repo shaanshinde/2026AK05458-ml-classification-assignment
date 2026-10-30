@@ -50,7 +50,7 @@ All metrics are measured on the test set (`test_data.csv`, 389 rows). Precision,
 | ML Model Name | Accuracy | AUC | Precision | Recall | F1 | MCC |
 |---|---|---|---|---|---|---|
 | Logistic Regression | 0.7275 | 0.9379 | 0.7613 | 0.7305 | 0.7418 | 0.6487 |
-| Decision Tree | | | | | | |
+| Decision Tree | 0.7532 | 0.8583 | 0.7739 | 0.7597 | 0.7647 | 0.6811 |
 | KNN | | | | | | |
 | Naive Bayes | | | | | | |
 | Support Vector Machine | | | | | | |
@@ -59,7 +59,7 @@ All metrics are measured on the test set (`test_data.csv`, 389 rows). Precision,
 
 | ML Model Name | Observation about model performance |
 |---|---|
-| Logistic Regression | |
+| Logistic Regression | Good baseline with 72.8% accuracy, macro F1 of 0.74 and MCC of 0.65. AUC is high (0.94), so even when its first guess is wrong, the correct fault is usually ranked near the top. It does very well on K_Scratch, Z_Scratch and Stains, which are easy to separate using shape and size features. It struggles with Pastry, Bumps and Other_Faults, which overlap with each other and need curved boundaries that a linear model can't draw. |
 | Decision Tree | |
 | KNN | |
 | Naive Bayes | |
