@@ -60,7 +60,7 @@ All metrics are measured on the test set (`test_data.csv`, 389 rows). Precision,
 | ML Model Name | Observation about model performance |
 |---|---|
 | Logistic Regression | Good baseline with 72.8% accuracy, macro F1 of 0.74 and MCC of 0.65. AUC is high (0.94), so even when its first guess is wrong, the correct fault is usually ranked near the top. It does very well on K_Scratch, Z_Scratch and Stains, which are easy to separate using shape and size features. It struggles with Pastry, Bumps and Other_Faults, which overlap with each other and need curved boundaries that a linear model can't draw. |
-| Decision Tree | |
+| Decision Tree | Better than Logistic Regression on 5 of the 6 metrics (accuracy 75.3%, macro F1 0.76, MCC 0.68), mainly because its step-by-step rules can follow the overlapping regions of Bumps, Z_Scratch and Dirtiness. AUC is lower (0.86) because almost every prediction is made with 100% confidence, so it ranks the other classes poorly. The tree is clearly overfitted (training F1 0.99 against test F1 0.76), but cross-validation and test scores match closely, so 0.76 is an honest estimate. Pastry remains the weakest class with only 13 of 32 plates found. |
 | KNN | |
 | Naive Bayes | |
 | Support Vector Machine | |
