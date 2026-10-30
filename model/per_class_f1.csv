@@ -1,0 +1,8 @@
+Fault_Type,Logistic Regression,Decision Tree
+Bumps,0.6216,0.7186
+Dirtiness,0.7368,0.8182
+K_Scratch,0.9281,0.8571
+Other_Faults,0.6761,0.7143
+Pastry,0.5373,0.4643
+Stains,0.8571,0.8571
+Z_Scratch,0.8354,0.9231

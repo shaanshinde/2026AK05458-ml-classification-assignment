@@ -11,6 +11,7 @@ Usage:
 For each trained model this script:
 - saves the best pipeline to model/<name>.joblib
 - adds or updates its row in model/metrics.csv
+- adds or updates its column of per-class test F1 in model/per_class_f1.csv
 - adds or updates its best parameters in model/best_params.json
 - prints the test metrics, best parameters and classification report
 It also saves model/feature_columns.json and model/class_labels.json.
@@ -24,7 +25,7 @@ from pathlib import Path
 import joblib
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, f1_score
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -41,6 +42,7 @@ TRAIN_PATH = ROOT / "data" / "train_data.csv"
 TEST_PATH = ROOT / "test_data.csv"
 MODEL_DIR = ROOT / "model"
 METRICS_PATH = MODEL_DIR / "metrics.csv"
+PER_CLASS_F1_PATH = MODEL_DIR / "per_class_f1.csv"
 BEST_PARAMS_PATH = MODEL_DIR / "best_params.json"
 FEATURE_COLUMNS_PATH = MODEL_DIR / "feature_columns.json"
 CLASS_LABELS_PATH = MODEL_DIR / "class_labels.json"
@@ -95,6 +97,18 @@ def update_metrics_csv(display_name: str, metrics: dict) -> None:
     table[["Model"] + METRIC_NAMES].to_csv(METRICS_PATH, index=False)
 
 
+def update_per_class_f1(display_name: str, model, y_true, y_pred) -> None:
+    # Rows are the fault types, one column per model.
+    scores = f1_score(y_true, y_pred, labels=model.classes_, average=None, zero_division=0)
+    column = pd.Series(scores, index=pd.Index(model.classes_, name="Fault_Type")).round(4)
+    if PER_CLASS_F1_PATH.exists():
+        table = pd.read_csv(PER_CLASS_F1_PATH, index_col="Fault_Type")
+    else:
+        table = pd.DataFrame(index=column.index)
+    table[display_name] = column
+    table.to_csv(PER_CLASS_F1_PATH)
+
+
 def update_best_params(name: str, best_params: dict) -> None:
     all_params = {}
     if BEST_PARAMS_PATH.exists():
@@ -127,7 +141,9 @@ def train_one(name: str, X_train, y_train, X_test, y_test) -> None:
     joblib.dump(best_model, model_path)
 
     metrics = compute_metrics(best_model, X_test, y_test)
+    y_pred = best_model.predict(X_test)
     update_metrics_csv(display_name, metrics)
+    update_per_class_f1(display_name, best_model, y_test, y_pred)
     update_best_params(name, search.best_params_)
 
     print(f"Saved model: {model_path.relative_to(ROOT)}")
@@ -137,7 +153,7 @@ def train_one(name: str, X_train, y_train, X_test, y_test) -> None:
     for metric_name, value in metrics.items():
         print(f"  {metric_name:<10}{value:.4f}")
     print("\nClassification report (test data):")
-    print(classification_report(y_test, best_model.predict(X_test), digits=4, zero_division=0))
+    print(classification_report(y_test, y_pred, digits=4, zero_division=0))
 
     final_step = best_model.named_steps["model"]
     if hasattr(final_step, "feature_importances_"):

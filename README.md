@@ -83,3 +83,17 @@ streamlit run app.py
 ```
 
 `test_data.csv` (to be added at the repo root) is a sample test file to upload in the app.
+
+## g. Additional Analysis: F1 by Fault Type
+
+This table shows how well each model identifies each fault type on the test data (F1 score per fault type), along with the number of test plates for each fault type.
+
+| Fault Type | Test Plates | Logistic Regression | Decision Tree |
+|---|---|---|---|
+| Bumps | 81 | 0.6216 | 0.7186 |
+| Dirtiness | 11 | 0.7368 | 0.8182 |
+| K_Scratch | 78 | 0.9281 | 0.8571 |
+| Other_Faults | 135 | 0.6761 | 0.7143 |
+| Pastry | 32 | 0.5373 | 0.4643 |
+| Stains | 14 | 0.8571 | 0.8571 |
+| Z_Scratch | 38 | 0.8354 | 0.9231 |
