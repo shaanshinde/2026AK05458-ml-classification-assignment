@@ -14,5 +14,9 @@
   },
   "naive_bayes": {
     "model__var_smoothing": 0.0007742636826811277
+  },
+  "svm": {
+    "model__C": 10,
+    "model__gamma": 0.01
   }
 }

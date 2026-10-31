@@ -32,6 +32,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 
 from model_utils import FEATURE_COLUMNS, METRIC_NAMES, TARGET_COLUMN, compute_metrics
@@ -92,6 +93,17 @@ MODELS = {
             ("model", GaussianNB()),
         ]),
         "param_grid": {"model__var_smoothing": np.logspace(-12, -2, 10)},
+    },
+    "svm": {
+        "display_name": "Support Vector Machine",
+        "pipeline": Pipeline([
+            ("scaler", StandardScaler()),
+            ("model", SVC(kernel="rbf", probability=True, random_state=RANDOM_STATE)),
+        ]),
+        "param_grid": {
+            "model__C": [0.1, 1, 10, 100],
+            "model__gamma": ["scale", 0.01, 0.1, 1],
+        },
     },
 }
 TOP_FEATURES_TO_SHOW = 10
