@@ -23,10 +23,12 @@ import json
 from pathlib import Path
 
 import joblib
+import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, f1_score
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
+from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -83,6 +85,14 @@ MODELS = {
             "model__p": [1, 2],
         },
     },
+    "naive_bayes": {
+        "display_name": "Naive Bayes",
+        "pipeline": Pipeline([
+            ("scaler", StandardScaler()),
+            ("model", GaussianNB()),
+        ]),
+        "param_grid": {"model__var_smoothing": np.logspace(-12, -2, 10)},
+    },
 }
 TOP_FEATURES_TO_SHOW = 10
 
@@ -107,7 +117,7 @@ def update_metrics_csv(display_name: str, metrics: dict) -> None:
             table = pd.concat([table, pd.DataFrame([row])], ignore_index=True)
     else:
         table = pd.DataFrame([row])
-    table[["Model"] + METRIC_NAMES].to_csv(METRICS_PATH, index=False)
+    table[["Model"] + METRIC_NAMES].to_csv(METRICS_PATH, index=False, float_format="%.4f")
 
 
 def update_per_class_f1(display_name: str, model, y_true, y_pred) -> None:

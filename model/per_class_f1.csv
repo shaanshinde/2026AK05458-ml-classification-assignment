@@ -1,8 +1,8 @@
-Fault_Type,Logistic Regression,Decision Tree,KNN
-Bumps,0.6216,0.7186,0.6864
-Dirtiness,0.7368,0.8182,0.8182
-K_Scratch,0.9281,0.8571,0.9615
-Other_Faults,0.6761,0.7143,0.7000
-Pastry,0.5373,0.4643,0.4483
-Stains,0.8571,0.8571,0.8000
-Z_Scratch,0.8354,0.9231,0.8675
+Fault_Type,Logistic Regression,Decision Tree,KNN,Naive Bayes
+Bumps,0.6216,0.7186,0.6864,0.5951
+Dirtiness,0.7368,0.8182,0.8182,0.4737
+K_Scratch,0.9281,0.8571,0.9615,0.9150
+Other_Faults,0.6761,0.7143,0.7000,0.4086
+Pastry,0.5373,0.4643,0.4483,0.4348
+Stains,0.8571,0.8571,0.8000,0.8000
+Z_Scratch,0.8354,0.9231,0.8675,0.8378
