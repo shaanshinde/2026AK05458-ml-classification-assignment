@@ -72,17 +72,40 @@ TODO: Add the Streamlit Community Cloud app URL.
 
 ## f. How to Run Locally
 
-TODO: Finalise the steps below once the app is built.
+Requires Python 3.12.
+
+1. Clone the repository and create a virtual environment:
 
 ```bash
+git clone https://github.com/shaanshinde/2026AK05458-ml-classification-assignment.git
+cd 2026AK05458-ml-classification-assignment
 python3 -m venv .venv
 source .venv/bin/activate
+```
+
+On Windows, activate it with `.venv\Scripts\activate` instead.
+
+2. Install the requirements:
+
+```bash
 pip install -r requirements.txt
+```
+
+3. (Optional) Rebuild the data and the models. The trained models are already saved in `model/`, so this step is not needed to run the app. `prepare_data.py` downloads the dataset from UCI and needs `ucimlrepo`, which is not in `requirements.txt`.
+
+```bash
+pip install ucimlrepo
+python prepare_data.py
 python train_models.py
+```
+
+4. Start the app:
+
+```bash
 streamlit run app.py
 ```
 
-`test_data.csv` (to be added at the repo root) is a sample test file to upload in the app.
+The app opens at http://localhost:8501. Click **Download sample test data** in the sidebar to get `test_data.csv`, then upload it to see the metrics, confusion matrix and classification report for each model.
 
 ## g. Additional Analysis: F1 by Fault Type
 
