@@ -271,7 +271,8 @@ def main() -> None:
         model_name = st.selectbox("Choose a model", list(MODEL_FILES))
         st.divider()
         st.caption(
-            "Shinde Shantanu Ganesh | BITS ID: 2026AK05458  \n"
+            "**Shinde Shantanu Ganesh**  \n"
+            "**BITS ID: 2026AK05458**  \n"
             "Machine Learning - Assignment 2  \n"
             "M.Tech AI/ML, BITS Pilani WILP"
         )
