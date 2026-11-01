@@ -68,7 +68,9 @@ All metrics are measured on the test set (`test_data.csv`, 389 rows). Precision,
 
 ## e. Streamlit App Link
 
-TODO: Add the Streamlit Community Cloud app URL.
+https://steel-plates-fault-2026ak05458.streamlit.app
+
+The app is deployed on Streamlit Community Cloud from the `main` branch of this repository.
 
 ## f. How to Run Locally
 
