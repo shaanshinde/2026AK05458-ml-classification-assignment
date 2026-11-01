@@ -269,6 +269,12 @@ def main() -> None:
         uploaded_file = st.file_uploader("Upload a CSV file", type="csv")
         st.header("Model")
         model_name = st.selectbox("Choose a model", list(MODEL_FILES))
+        st.divider()
+        st.caption(
+            "Shinde Shantanu Ganesh | BITS ID: 2026AK05458  \n"
+            "Machine Learning - Assignment 2  \n"
+            "M.Tech AI/ML, BITS Pilani WILP"
+        )
 
     data = None
     if uploaded_file is None:
