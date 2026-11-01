@@ -3,7 +3,7 @@
 BITS Pilani WILP, M.Tech, Machine Learning Assignment 2.
 
 - **Name:** SHINDE SHANTANU GANESH
-- **BITS Student ID:** 2026ak05458
+- **BITS Student ID:** 2026AK05458
 
 ## a. Problem Statement
 
@@ -40,8 +40,6 @@ The classes are imbalanced, so the data is split 80/20 into train (1,552 rows) a
 https://github.com/shaanshinde/2026AK05458-ml-classification-assignment
 
 ## d. Models Used
-
-TODO: Fill in the metrics for the remaining models after running `train_models.py`.
 
 All metrics are measured on the test set (`test_data.csv`, 389 rows). Precision, Recall and F1 are macro-averaged over the 7 classes, and AUC is one-vs-rest macro-averaged.
 
