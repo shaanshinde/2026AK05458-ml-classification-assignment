@@ -9,6 +9,7 @@ import json
 import math
 from pathlib import Path
 
+import altair as alt
 import joblib
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -54,6 +55,8 @@ FAULT_COUNTS = {
 }
 
 HIGHLIGHT_STYLE = "font-weight: bold; background-color: rgba(46, 160, 67, 0.25)"
+TOP_BAR_COLOUR = "#2EA043"
+OTHER_BAR_COLOUR = "#9AA4AE"
 
 
 @st.cache_resource
@@ -157,7 +160,7 @@ def show_selected_model(model_name: str, model, X, y, class_labels: list[str]) -
         plt.close(fig)
     with right:
         st.markdown("**Classification report**")
-        st.dataframe(classification_report_table(y, y_pred, class_labels))
+        st.dataframe(classification_report_table(y, y_pred, class_labels), placeholder="")
 
 
 def classification_report_table(y, y_pred, class_labels: list[str]):
@@ -183,11 +186,35 @@ def show_comparison(models: dict, X, y) -> None:
         {name: compute_metrics(model, X, y) for name, model in models.items()}
     ).T[METRIC_NAMES]
     table.index.name = "Model"
-    st.dataframe(table.style.format("{:.4f}", na_rep="N/A").highlight_max(axis=0, props=HIGHLIGHT_STYLE))
+    st.dataframe(
+        table.style.format("{:.4f}").highlight_max(axis=0, props=HIGHLIGHT_STYLE),
+        placeholder="N/A",
+    )
     st.caption("The best value in each column is highlighted.")
 
-    st.markdown("**Macro F1 by model**")
-    st.bar_chart(table.reset_index(), x="Model", y="F1", sort=False)
+    metric = st.radio("Metric to chart", METRIC_NAMES, index=METRIC_NAMES.index("F1"), horizontal=True)
+    values = table[metric].dropna()
+    if values.empty:
+        st.info(f"{metric} is not available for the uploaded data, so there is nothing to chart.")
+        return
+    st.altair_chart(metric_bar_chart(values, metric))
+
+
+def metric_bar_chart(values: pd.Series, metric: str) -> alt.LayerChart:
+    """Horizontal bars sorted from highest to lowest, with the top model in a different colour."""
+    data = values.rename("Value").reset_index()
+    data["Top"] = data["Value"] == data["Value"].max()
+    # Leave room on the right for the value labels.
+    x_scale = alt.Scale(domain=[min(0.0, data["Value"].min()), max(1.0, data["Value"].max() + 0.1)], nice=False)
+    base = alt.Chart(data).encode(
+        y=alt.Y("Model:N", sort="-x", title=None, axis=alt.Axis(labelLimit=300)),
+        x=alt.X("Value:Q", title=metric, scale=x_scale),
+    )
+    bars = base.mark_bar().encode(
+        color=alt.condition(alt.datum.Top, alt.value(TOP_BAR_COLOUR), alt.value(OTHER_BAR_COLOUR))
+    )
+    labels = base.mark_text(align="left", dx=4).encode(text=alt.Text("Value:Q", format=".4f"))
+    return (bars + labels).properties(title=f"{metric} by model", height=60 * len(data))
 
 
 def show_about() -> None:
